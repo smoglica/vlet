@@ -1,6 +1,6 @@
 module.exports = {
   env: {
-    es2020: true,
+    es2021: true,
     node: true,
   },
   extends: [
@@ -9,6 +9,7 @@ module.exports = {
     'plugin:prettier/recommended',
   ],
   parserOptions: {
+    ecmaVersion: 'latest',
     sourceType: 'module',
     project: 'tsconfig.eslint.json',
   },
