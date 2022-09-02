@@ -8,6 +8,9 @@
   "bin": {
     "vlet": "dist/index.js"
   },
+  "engines": {
+    "node": ">= 16.0.0"
+  },
   "scripts": {
     "dev": "tsc -w",
     "build": "tsc && npm run chmod",
