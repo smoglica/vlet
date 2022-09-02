@@ -4,11 +4,14 @@
   "description": "A light-weight command-line interface for interacting with Docker Compose services",
   "author": "Skender Moglica <moglica.s@gmail.com>",
   "license": "ISC",
+  "type": "module",
   "bin": {
     "vlet": "dist/index.js"
   },
   "scripts": {
-    "build": "tsc",
+    "dev": "tsc -w",
+    "build": "tsc && npm run chmod",
+    "chmod": "chmod u+x dist/index.js",
     "prepare": "husky install"
   },
   "devDependencies": {
