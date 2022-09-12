@@ -1,13 +1,17 @@
 #!/usr/bin/env node
 
 import { chalk, echo } from 'zx';
+import { config } from 'dotenv';
+import { expand } from 'dotenv-expand';
 import {
   isDockerComposeInstalled,
   isDockerRunning,
   isDockerServiceRunning,
 } from './docker.js';
 
-const main = async () => {
+expand(config());
+
+(async () => {
   const VLET_APP_SERVICE = process.env.VLET_APP_SERVICE || 'app';
 
   if (!(await isDockerRunning())) {
@@ -32,6 +36,4 @@ const main = async () => {
       )
     );
   }
-};
-
-main();
+})();
