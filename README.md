@@ -15,5 +15,5 @@
 npm run dev
 
 # Execute program
-npm run vlet <command>
+npm run vlet -- <command>
 ```

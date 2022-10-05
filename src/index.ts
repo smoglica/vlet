@@ -37,32 +37,38 @@ expand(config());
   }
 
   if (isKnownCommand(command)) {
-    if (await isDockerServiceRunning(VLET_APP_SERVICE)) {
-      switch (command) {
-        case 'sh':
-        case 'bash':
-          await $`docker compose exec ${VLET_APP_SERVICE} ${command} -c "${shift(
-            args,
-            1
-          )}"`.nothrow();
-
-          break;
-        case 'shell':
-          await $`docker compose exec ${VLET_APP_SERVICE} sh`.nothrow();
-
-          break;
-        default:
-          await $`docker compose exec ${VLET_APP_SERVICE} ${args}`.nothrow();
-
-          break;
-      }
-    } else {
+    if (!(await isDockerServiceRunning(VLET_APP_SERVICE))) {
       echo(
         chalk.red(
           `Docker Compose service name \`${VLET_APP_SERVICE}\` isn't running.
             \nYou may run \`vlet up -d\` or \`npx vlet up -d\`.`
         )
       );
+
+      return;
+    }
+
+    switch (command) {
+      case 'sh':
+      case 'bash': {
+        const commands = shift(args, 1);
+
+        if (!commands.length) {
+          return;
+        }
+
+        await $`docker compose exec ${VLET_APP_SERVICE} ${command} -c "${commands}"`.nothrow();
+
+        break;
+      }
+      case 'shell':
+        await $`docker compose exec ${VLET_APP_SERVICE} sh`.nothrow();
+
+        break;
+      default:
+        await $`docker compose exec ${VLET_APP_SERVICE} ${args}`.nothrow();
+
+        break;
     }
 
     return;
