@@ -12,8 +12,8 @@
 
 ```bash
 # Starts script compilation in watch mode
-yarn dev
+npm run dev
 
 # Execute program
-yarn vlet <command>
+npm run vlet <command>
 ```

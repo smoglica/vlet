@@ -8,7 +8,7 @@ import {
   isDockerRunning,
   isDockerServiceRunning,
 } from './docker.js';
-import { isKnownCommand } from './utils.js';
+import { isKnownCommand, shift } from './utils.js';
 
 expand(config());
 
@@ -38,7 +38,24 @@ expand(config());
 
   if (isKnownCommand(command)) {
     if (await isDockerServiceRunning(VLET_APP_SERVICE)) {
-      $`docker compose exec ${VLET_APP_SERVICE} ${args}`.nothrow();
+      switch (command) {
+        case 'sh':
+        case 'bash':
+          await $`docker compose exec ${VLET_APP_SERVICE} ${command} -c "${shift(
+            args,
+            1
+          )}"`.nothrow();
+
+          break;
+        case 'shell':
+          await $`docker compose exec ${VLET_APP_SERVICE} sh`.nothrow();
+
+          break;
+        default:
+          await $`docker compose exec ${VLET_APP_SERVICE} ${args}`.nothrow();
+
+          break;
+      }
     } else {
       echo(
         chalk.red(

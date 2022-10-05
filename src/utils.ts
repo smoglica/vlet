@@ -1,4 +1,4 @@
-export const DEFAULT_EXEC_COMMANDS = ['node', 'npm', 'yarn', 'shell', 'bash'];
+const DEFAULT_EXEC_COMMANDS = ['node', 'npm', 'yarn', 'shell', 'bash', 'sh'];
 
 export const isKnownCommand = (command: string): boolean =>
   [
@@ -10,3 +10,5 @@ export const isKnownCommand = (command: string): boolean =>
       ...DEFAULT_EXEC_COMMANDS,
     ]),
   ].includes(command);
+
+export const shift = (args: string[], n: number) => args.slice(n);
