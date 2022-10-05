@@ -15,7 +15,8 @@
     "dev": "tsc -w",
     "build": "tsc && npm run chmod",
     "chmod": "chmod u+x dist/index.js",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "vlet": "yarn chmod && ./dist/index.js"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.1.2",
