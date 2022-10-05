@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { chalk, echo } from 'zx';
+import { chalk, echo, $ } from 'zx';
 import { config } from 'dotenv';
 import { expand } from 'dotenv-expand';
 import {
@@ -8,6 +8,7 @@ import {
   isDockerRunning,
   isDockerServiceRunning,
 } from './docker.js';
+import { isKnownCommand } from './utils.js';
 
 expand(config());
 
@@ -28,12 +29,27 @@ expand(config());
     return;
   }
 
-  if (!(await isDockerServiceRunning(VLET_APP_SERVICE))) {
-    echo(
-      chalk.red(
-        `Docker Compose service name \`${VLET_APP_SERVICE}\` isn't running.
-        \nYou may run \`vlet up -d\` or \`npx vlet up -d\`.`
-      )
-    );
+  const args = process.argv.slice(2);
+  const command = args[0] || '';
+
+  if (!command) {
+    return;
   }
+
+  if (isKnownCommand(command)) {
+    if (await isDockerServiceRunning(VLET_APP_SERVICE)) {
+      $`docker compose exec ${VLET_APP_SERVICE} ${args}`.nothrow();
+    } else {
+      echo(
+        chalk.red(
+          `Docker Compose service name \`${VLET_APP_SERVICE}\` isn't running.
+            \nYou may run \`vlet up -d\` or \`npx vlet up -d\`.`
+        )
+      );
+    }
+
+    return;
+  }
+
+  await $`docker compose ${args}`.nothrow();
 })();
