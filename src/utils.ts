@@ -1,4 +1,12 @@
-const DEFAULT_EXEC_COMMANDS = ['node', 'npm', 'yarn', 'shell', 'bash', 'sh'];
+const DEFAULT_EXEC_COMMANDS = [
+  'node',
+  'npm',
+  'npx',
+  'yarn',
+  'shell',
+  'bash',
+  'sh',
+];
 
 export const isKnownCommand = (command: string): boolean =>
   [
