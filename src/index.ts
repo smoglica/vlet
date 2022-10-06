@@ -32,23 +32,19 @@ expand(config());
   }
 
   const args = shift(process.argv, 2);
-  const command = args[0] || '';
+  const parsedArgs = argv._ || [];
+  const command = parsedArgs[0] || '';
 
   if (!command) {
     return;
   }
 
-  const COMPOSE_FILE = process.env.COMPOSE_FILE || 'docker-compose.yaml';
-
   if (!isKnownCommand(command)) {
-    const hasFileOption = !!argv.f || !!argv.file;
-    const options = hasFileOption ? [] : ['-f', COMPOSE_FILE];
-
-    if (argv._.includes('up')) {
+    if (parsedArgs.includes('up')) {
       await setUserIdAndGroupIdInDotEnvFile(argv['env-file']);
     }
 
-    await $`docker compose ${options} ${args}`.nothrow();
+    await $`docker compose ${args}`.nothrow();
 
     return;
   }
@@ -66,6 +62,13 @@ expand(config());
     return;
   }
 
+  const baseDockerComposeCommand = [
+    'docker',
+    'compose',
+    'exec',
+    VLET_APP_SERVICE,
+  ];
+
   switch (command) {
     case 'sh':
     case 'bash': {
@@ -75,16 +78,16 @@ expand(config());
         return;
       }
 
-      await $`docker compose -f ${COMPOSE_FILE} exec ${VLET_APP_SERVICE} ${command} -c "${commands}"`.nothrow();
+      await $`${baseDockerComposeCommand} ${command} -c "${commands}"`.nothrow();
 
       break;
     }
     case 'shell':
-      await $`docker compose -f ${COMPOSE_FILE} exec ${VLET_APP_SERVICE} sh`.nothrow();
+      await $`${baseDockerComposeCommand} sh`.nothrow();
 
       break;
     default:
-      await $`docker compose -f ${COMPOSE_FILE} exec ${VLET_APP_SERVICE} ${args}`.nothrow();
+      await $`${baseDockerComposeCommand} ${args}`.nothrow();
 
       break;
   }
