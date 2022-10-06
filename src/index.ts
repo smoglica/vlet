@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { chalk, echo, $ } from 'zx';
+import { chalk, echo, $, argv } from 'zx';
 import { config } from 'dotenv';
 import { expand } from 'dotenv-expand';
 import {
@@ -27,7 +27,7 @@ expand(config());
     return;
   }
 
-  const args = process.argv.slice(2);
+  const args = shift(process.argv, 2);
   const command = args[0] || '';
 
   if (!command) {
@@ -37,7 +37,10 @@ expand(config());
   const COMPOSE_FILE = process.env.COMPOSE_FILE || 'docker-compose.yaml';
 
   if (!isKnownCommand(command)) {
-    await $`docker compose -f ${COMPOSE_FILE} ${args}`.nothrow();
+    const hasFileOption = !!argv.f || !!argv.file;
+    const options = hasFileOption ? [] : ['-f', COMPOSE_FILE];
+
+    await $`docker compose ${options} ${args}`.nothrow();
 
     return;
   }
