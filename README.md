@@ -36,7 +36,8 @@ npx vlet npx   # Run a `npx` command
 npx vlet yarn  # Run a `yarn` command
 
 # Container CLI
-npx vlet shell # Start a shell session within the application container
-npx vlet bash  # Run a `bash` command within the application container
-npx vlet sh    # Run a `sh` command within the application container
+npx vlet bash            # Run a shell session with `bash` within the application container
+npx vlet sh              # Run a shell session with `sh` within the application container
+npx vlet bash [COMMAND]  # Run a `bash` command within the application container
+npx vlet sh [COMMAND]    # Run a `sh` command within the application container
 ```

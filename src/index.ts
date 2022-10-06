@@ -31,7 +31,7 @@ expand(config());
     return;
   }
 
-  const args = shift(process.argv, 2);
+  let args = shift(process.argv, 2);
   const parsedArgs = argv._ || [];
   const command = parsedArgs[0] || '';
 
@@ -49,7 +49,8 @@ expand(config());
     return;
   }
 
-  const VLET_APP_SERVICE = process.env.VLET_APP_SERVICE || 'app';
+  const VLET_APP_SERVICE =
+    argv.service || process.env.VLET_APP_SERVICE || 'app';
 
   if (!(await isDockerServiceRunning(VLET_APP_SERVICE))) {
     echo(
@@ -60,6 +61,10 @@ expand(config());
     );
 
     return;
+  }
+
+  if (argv.service) {
+    args = shift(args, 1);
   }
 
   const baseDockerComposeCommand = [
@@ -75,6 +80,8 @@ expand(config());
       const commands = shift(args, 1);
 
       if (!commands.length) {
+        await $`${baseDockerComposeCommand} ${command}`.nothrow();
+
         return;
       }
 
@@ -82,10 +89,6 @@ expand(config());
 
       break;
     }
-    case 'shell':
-      await $`${baseDockerComposeCommand} sh`.nothrow();
-
-      break;
     default:
       await $`${baseDockerComposeCommand} ${args}`.nothrow();
 
