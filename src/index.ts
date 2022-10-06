@@ -8,7 +8,11 @@ import {
   isDockerRunning,
   isDockerServiceRunning,
 } from './docker.js';
-import { isKnownCommand, shift } from './utils.js';
+import {
+  isKnownCommand,
+  setUserIdAndGroupIdInDotEnvFile,
+  shift,
+} from './utils.js';
 
 expand(config());
 
@@ -39,6 +43,10 @@ expand(config());
   if (!isKnownCommand(command)) {
     const hasFileOption = !!argv.f || !!argv.file;
     const options = hasFileOption ? [] : ['-f', COMPOSE_FILE];
+
+    if (argv._.includes('up')) {
+      await setUserIdAndGroupIdInDotEnvFile(argv['env-file']);
+    }
 
     await $`docker compose ${options} ${args}`.nothrow();
 

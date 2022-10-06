@@ -1,3 +1,6 @@
+import { os, fs, path, chalk, echo } from 'zx';
+import { parse } from 'dotenv';
+
 const DEFAULT_EXEC_COMMANDS = [
   'node',
   'npm',
@@ -20,3 +23,49 @@ export const isKnownCommand = (command: string): boolean =>
   ].includes(command);
 
 export const shift = (args: string[], n: number) => args.slice(n);
+
+export const setUserIdAndGroupIdInDotEnvFile = async (
+  pathToEnvFile = path.join(process.cwd(), '.env')
+) => {
+  const pathExists = await fs.pathExists(pathToEnvFile);
+
+  if (!pathExists) {
+    echo(chalk.yellow(`File in path ${pathToEnvFile} not found.`));
+
+    return;
+  }
+
+  const access = await fs.access(
+    pathToEnvFile,
+    fs.constants.R_OK || fs.constants.W_OK
+  );
+
+  if (access !== undefined) {
+    echo(
+      chalk.yellow(
+        `Not enough permissions to read or write in ${pathToEnvFile}.`
+      )
+    );
+
+    return;
+  }
+
+  const userInfo = os.userInfo();
+  const userId = userInfo.uid.toString();
+  const groupId = userInfo.gid.toString();
+  const dotEnvFileContent = await fs.readFile(pathToEnvFile, {
+    encoding: 'utf-8',
+  });
+
+  const parsedDotEnvFile = parse(dotEnvFileContent);
+
+  parsedDotEnvFile.VLET_USER_ID = userId;
+  parsedDotEnvFile.VLET_GROUP_ID = groupId;
+
+  const contentToWrite = Object.entries(parsedDotEnvFile).reduce(
+    (acc, [key, value]) => `${acc}${key}=${value}\n`,
+    ''
+  );
+
+  await fs.writeFile(pathToEnvFile, contentToWrite);
+};
