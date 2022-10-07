@@ -1,7 +1,7 @@
 import { os, fs, path, chalk, echo } from 'zx';
 import { parse } from 'dotenv';
 
-const DEFAULT_EXEC_COMMANDS = [
+export const DEFAULT_EXEC_COMMANDS = [
   'node',
   'npm',
   'npx',
@@ -11,16 +11,18 @@ const DEFAULT_EXEC_COMMANDS = [
   'sh',
 ];
 
+export const getKnownCommands = () => [
+  ...new Set([
+    ...DEFAULT_EXEC_COMMANDS,
+    ...(process.env.VLET_EXEC_COMMANDS?.trim()
+      ?.split(',')
+      .map(cmd => cmd.trim().toLowerCase())
+      .filter(cmd => cmd) || []),
+  ]),
+];
+
 export const isKnownCommand = (command: string): boolean =>
-  [
-    ...new Set([
-      ...(process.env.VLET_EXEC_COMMANDS?.trim()
-        ?.split(',')
-        .map(cmd => cmd.trim().toLowerCase())
-        .filter(cmd => cmd) || []),
-      ...DEFAULT_EXEC_COMMANDS,
-    ]),
-  ].includes(command);
+  getKnownCommands().includes(command);
 
 export const shift = (args: string[], n: number) => args.slice(n);
 
@@ -30,20 +32,20 @@ export const setUserIdAndGroupIdInDotEnvFile = async (
   const pathExists = await fs.pathExists(pathToEnvFile);
 
   if (!pathExists) {
-    echo(chalk.yellow(`File in path ${pathToEnvFile} not found.`));
+    echo(chalk.yellow(`File in path \`${pathToEnvFile}\` not found.`));
 
     return;
   }
 
   const access = await fs.access(
     pathToEnvFile,
-    fs.constants.R_OK || fs.constants.W_OK
+    fs.constants.R_OK | fs.constants.W_OK // eslint-disable-line no-bitwise
   );
 
   if (access !== undefined) {
     echo(
       chalk.yellow(
-        `Not enough permissions to read or write in ${pathToEnvFile}.`
+        `Not enough permissions to read or write in \`${pathToEnvFile}\`.`
       )
     );
 
