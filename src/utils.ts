@@ -6,7 +6,6 @@ export const DEFAULT_EXEC_COMMANDS = [
   'npm',
   'npx',
   'yarn',
-  'shell',
   'bash',
   'sh',
 ];

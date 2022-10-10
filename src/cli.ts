@@ -30,6 +30,8 @@ export default async function cli() {
   const command = parsedArgs[0] || '';
 
   if (!command) {
+    // TODO: showUsage();
+
     return;
   }
 
